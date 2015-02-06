@@ -10,15 +10,23 @@
 
     <title>K1103292 Google Maps API Submission</title>
 
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="mapsApi/css/mapStylesheet.css" rel="stylesheet">
+    <script src="mapsApi/js/mapScript.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?"></script>
+    <script type="text/javascript"  src="https://maps.googleapis.com/maps/api/js?libraries=weather&sensor=true_or_false"></script>
 
     <link href="bootstrap/css/cover.css" rel="stylesheet">
 
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <script src="boostrap/js/ie-emulation-modes-warning.js"></script>
-
+    <script>
+        google.maps.event.addDomListener(window, 'load', initialize);    
+    </script>
 </head>
 
 <body>
+    <!-- Map is added here -->
+    <div id="map-canvas"></div>
 
     <div class="site-wrapper">
 
@@ -28,7 +36,7 @@
 
                 <div class="masthead clearfix">
                     <div class="inner">
-                        <h3 class="masthead-brand">Google Maps API Submission</h3>
+                        <h3 class="masthead-brand">Google Maps API Submission - K1103292</h3>
                     </div>
                 </div>
             </div>
@@ -36,51 +44,227 @@
             <div class="row">
                 <div class="col-xs-6 col-sm-4">
                     <div class="btn-group-vertical" role="group" aria-label="Vertical button group">
-                        <!-- <button type="button" class="btn btn-default">Co-Ordinates</button> -->
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#coordsPrompt">Enter Co-Ordinates</button>
                         <div class="btn-group" role="group">
                             <button id="btnGroupVerticalDrop1" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                Goto Co-ords
+                                Zoom
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop1">
-                                <li><a href="#">Dropdown link</a>
+                                <li><a href="#" onclick="magnify(8)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 200%</a>
+                                </li>
+                                <li><a href="#" onclick="magnify(4)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 100%</a>
+                                </li>
+                                <li><a href="#" onclick="magnify(3)"><span class="glyphicon glyphicon-plus" aria-hidden="true"> </span> 75%</a>
+                                </li>
+                                <li><a href="#" onclick="magnify(2)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 50%</a>
+                                </li>
+                                <li><a href="#" onclick="magnify(1)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 25%</a>
+                                </li>
+                                <li><a href="#" onclick="magnify(-1)"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> 25%</a>
+                                </li>
+                                <li><a href="#" onclick="magnify(-2)"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> 50%</a>
+                                </li>
+                                <li><a href="#" onclick="magnify(-3)"><span class="glyphicon glyphicon-minus" aria-hidden="true" ></span> 75%</a>
+                                </li>
+                                <li><a href="#" onclick="magnify(-4)"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> 100%</a>
+                                </li>
+                                <li><a href="#" onclick="magnify(-8)"><span class="glyphicon glyphicon-minus" aria-hidden="true"></span> 200%</a>
                                 </li>
                             </ul>
                         </div>
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupVerticalDrop1" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                Add Marker
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop1">
-                                <li><a href="#">Dropdown link</a>
-                                </li>
-                                <li><a href="#">Dropdown link</a>
-                                </li>
-                            </ul>
-                        </div>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#markerPrompt">Add Marker</button>     
+                        <button type="button" class="btn btn-default" onclick="addCustomWeather()" value="button">Add Weather Layer</button>                                         
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#customMarkerPrompt">Add Marker at Last Clicked</button>  
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#customNodeSelectionPrompt">Draw Area</button>      
+                        <button type="button" class="btn btn-default" onclick="introduceArea()" value="button">Introduce Area</button>                                         
                     </div>
                 </div>
-                <div class="col-xs-6 col-sm-4">.col-xs-6 .col-sm-4</div>
+                <div class="col-xs-6 col-sm-4"></div>
                 <!-- Optional: clear the XS cols if their content doesn't match in height -->
                 <div class="clearfix visible-xs-block"></div>
                 <div class="col-xs-6 col-sm-4">
-                    <!-- Navbar on right ~ Zoom in/out-->
-                    <div class="btn-toolbar" role="toolbar" aria-label="Zoom Toolbar">
-                        <div class="btn-group" role="group" aria-label="Zoom Buttons">
 
-                            <button type="button" class="btn btn-default">Zoom +</button>
-                            <button type="button" class="btn btn-default">Zoom -</button>
-                        </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Modal Boxes -->
+        <!-- Request Co-ords modal--> 
+        <div class="modal fade" id="coordsPrompt" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="recipient-name" class="control-label">Latitude:</label>
+                                <input type="text" class="form-control" id="requestedLatitude">
+                            </div>
+                            <div class="form-group">
+                                <label for="recipient-name" class="control-label">Longitude:</label>
+                                <input type="text" class="form-control" id="requestedLongitude">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="navigate_to_coords()" value="button">Navigate to</button>
                     </div>
                 </div>
             </div>
         </div>
 
-    </div>
+        <!-- Request Marker Modal--> 
+	        <div class="modal fade" id="markerPrompt" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	            <div class="modal-dialog">
+	                <div class="modal-content">
+	                    <div class="modal-body">
+	                        <form>
+	                            <div class="form-group">
+	                                <label for="recipient-name" class="control-label">Latitude:</label>
+	                                <input type="text" class="form-control" id="requestedMarkerLatitude">
+	                            </div>
+	                            <div class="form-group">
+	                                <label for="recipient-name" class="control-label">Longitude:</label>
+	                                <input type="text" class="form-control" id="requestedMarkerLongitude">
+	                            </div>
+	                            <br>
+								<select class="form-control" id="selectedMarker">
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|">Select a marker</option>
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|">Default Marker</option>
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=camping|">Tent</option>
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=cafe|">Cafe</option>			
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=star|">Star</option>		
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=phone|">Phone</option>								    								    					    
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=cinema|">Cinema</option>	    						    								    					    
+								</select>
+								or
+								<br>
+								<select class="form-control" id="selectedMarkerNumber">
+									    <option value="none">Select a Number</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=1|">1</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=2|">2</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=3|">3</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=4|">4</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=5|">5</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=6|">6</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=7|">7</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=8|">8</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=9|">9</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=0|">0</option>							    					    
+									</select>																	
+								<br>
+	                            <div class="form-group">
+	                                <label for="recipient-name" class="control-label">Colour  Code(HEX):</label>
+	                                <input type="text" class="form-control" id="selectedMarkerColour">
+	                            </div>		 						
+								<br>								
+	                        </form>
+	                    </div>
+	                    <div class="modal-footer">
+	                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="addMarkers()" value="button">Place Marker(s)</button>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+
+
+        <!-- Request Custom Marker Modal--> 
+	        <div class="modal fade" id="customMarkerPrompt" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	           <div class="modal-dialog">
+	                <div class="modal-content">
+	                    <div class="modal-body">
+	                        <form>
+	                            <br>
+								<select class="form-control" id="selectedCustomPlacedMarker">
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|">Select a marker</option>
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|">Default Marker</option>
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=camping|">Tent</option>
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=cafe|">Cafe</option>			
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=star|">Star</option>		
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=phone|">Phone</option>								    								    					    
+								    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_icon&chld=cinema|">Cinema</option>	    						    								    					    
+								</select>
+								or
+								<br>
+								<select class="form-control" id="selectedCustomPlacedMarkerNumber">
+									    <option value="none">Select a number</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=1|">1</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=2|">2</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=3|">3</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=4|">4</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=5|">5</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=6|">6</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=7|">7</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=8|">8</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=9|">9</option>
+									    <option value="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=0|">0</option>							    					    
+									</select>																	
+								<br>
+	                            <div class="form-group">
+	                                <label for="recipient-name" class="control-label">Colour  Code(HEX):</label>
+	                                <input type="text" class="form-control" id="selectedCustomPlacedMarkerColour">
+	                            </div>		 						
+								<br>								
+	                        </form>
+	                    </div>
+	                    <div class="modal-footer">
+	                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="addCustomMarkers()" value="button">Place Marker(s)</button>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div>
+
+        <!-- Request Custom Marker Modal--> 
+	        <div class="modal fade" id="customNodeSelectionPrompt" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	           <div class="modal-dialog">
+	                <div class="modal-content">
+	                    <div class="modal-body">
+	                        <form>
+	                            <div class="form-group">
+	                                <label for="recipient-name" class="control-label">Area Colour Code(HEX):</label>
+	                                <input type="text" class="form-control" id="selectedCustomPlacedAreaColour">
+	                            </div>		 						
+	                    		Left click to place nodes. Once you finish placing nodes - you may doubleclick to exit node placing mode.
+	                        </form>
+	                    </div>
+	                    <div class="modal-footer">
+	                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="setAreaColour()" value="button">Place Nodes</button>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+
+
+	    <!-- Request Custom Weather Modal--> 
+	    <!-- 
+	        <div class="modal fade" id="customWeatherPrompt" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	           <div class="modal-dialog">
+	                <div class="modal-content">
+	                    <div class="modal-body">
+	                        <form>
+	                            <div class="form-group">
+	                                <label for="recipient-name" class="control-label">Temperature (C):</label>
+	                                <input type="text" class="form-control" id="customWeatherTemperature">
+	                            </div>		 																						
+	                        </form>
+	                    </div>
+	                    <div class="modal-footer">
+	                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+	                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="addCustomWeather()" value="button">Add Weather</button>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+	    </div> --> 
 
     </div>
-    bootstrap
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
     <script src="bootstrap/js/docs.min.js"></script>
